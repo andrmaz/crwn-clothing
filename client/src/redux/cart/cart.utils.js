@@ -14,18 +14,19 @@ export const addItemToCart = (cartItems, cartItemToAdd) => {
     return [ ...cartItems, { ...cartItemToAdd, quantity: 1 }];
 }
 
-export const removeItemFromCart = (cartItems, cartItemToremove) => {
+export const removeItemFromCart = (cartItems, cartItemToRemove) => {
     const existingCartItem = cartItems.find(
-        cartItem => cartItem.id === cartItemToremove.id
-    )
-    if (existingCartItem === 1) {
-        return cartItems.filter(cartItem => cartItem.id !== cartItemToremove.id)
+        cartItem => cartItem.id === cartItemToRemove.id
+    );
+
+    if (existingCartItem.quantity === 1) {
+        return cartItems.filter(cartItem => cartItem.id !== cartItemToRemove.id)
     }
 
     return cartItems.map(
         cartItem => 
-        cartItem.id === cartItemToremove.id ? 
-        { ...cartItems, quantity: cartItem.quantity -1 }
+        cartItem.id === cartItemToRemove.id ? 
+        { ...cartItem, quantity: cartItem.quantity -1 }
         : cartItem
     );
 }
