@@ -2,6 +2,16 @@
     width: 380px;
     display: flex;
     flex-direction: column;
+    width: 80vw;
+
+    @media screen and (max-width: 800px) {
+        padding-bottom: 30px;
+    }
+
+    @media screen and (min-width: 601px) {
+        max-width: 40vw;
+        margin: 20px;
+    }
 
     .title {
         margin: 10px 0;
@@ -10,5 +20,9 @@
     .buttons {
         display: flex;
         justify-content: space-between;
+
+        @media screen and (min-width: 600px) and (max-width: 740px) {
+            flex-flow: column;
+        }
     }
 }

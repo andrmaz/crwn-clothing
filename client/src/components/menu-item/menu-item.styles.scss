@@ -25,6 +25,10 @@
 
   &.large {
     height: 380px;
+
+    @media screen and (max-width: 376px) {
+      height: 20vh;
+    }
   }
 
   &:first-child {
@@ -33,6 +37,23 @@
 
   &:last-child {
     margin-left: 7.5px;
+  }
+
+  @media screen and (min-width: 1025px) {
+    height: 300px;
+  }
+
+  @media screen and (max-width: 800px) {
+    height: 300px;
+  }
+
+  @media screen and (max-width: 470px) {
+    height: 380px;
+  }
+
+  @media screen and (max-width: 376px) {
+    width: 90%;
+    height: 20vh;
   }
 
   .background-image {
