@@ -1,4 +1,4 @@
-import React, { Component, useEffect, lazy, Suspense } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -23,14 +23,12 @@ const ShopPage = lazy(() => import('./pages/shop/shop.component'));
 const SignInAndSignUpPage = lazy(() => import('./pages/sign-in-and-sign-up/sign-in-and-sign-up.component'));
 const CheckoutPage = lazy(() => import('./pages/checkout/checkout.component'));
 
-class App extends Component {
-
-  unsubscribeFromAuth = null;
+const App = ({currentUser, setCurrentUser}) => {
   
-  componentDidMount() {
-    const {setCurrentUser} = this.props;
+  useEffect(() => {
 
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+    const unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
 
@@ -41,47 +39,44 @@ class App extends Component {
               ...snapShot.data()
             }, 
             () => {
-              console.log('Current User ', setCurrentUser)
+              console.log('Current User : ', setCurrentUser)
             }
           );
         })
       } else {
         setCurrentUser(userAuth);
+        console.log('Current User : ', setCurrentUser)
         //addCollectionAndDocuments('collections', collectionsArray)
       }
     })
-  }
+
+    return () => unsubscribeFromAuth()
+
+  }, [setCurrentUser])
   
-
-  componentWillUnmount() {
-    this.unsubscribeFromAuth();
-  }
-
-  render() {
-    return (
-      <div>
-        <GlobalStyle />
-        <Header />
-        <Switch>
-          <ErrorBoundary>
+  return (
+    <div>
+      <GlobalStyle />
+      <Header />
+      <Switch>
+        <ErrorBoundary>
+          <Suspense fallback={<Spinner />}>
             <Route exact path='/' component={HomePage} />
-            <Suspense fallback={<Spinner />}>
-              <Route path='/shop' component={ShopPage} />
-              <Route exact path='/checkout' component={CheckoutPage}/>
-              <Route exact path='/signin' render={() => 
-                this.props.currentUser ? (
-                  <Redirect to='/' />
-                ) : (
-                  <SignInAndSignUpPage />
-                )
-              }
-              />
-            </Suspense>
-          </ErrorBoundary>
-        </Switch>
-      </div>
-    );
-  } 
+            <Route path='/shop' component={ShopPage} />
+            <Route exact path='/checkout' component={CheckoutPage}/>
+            <Route exact path='/signin' render={() => 
+              currentUser ? (
+                <Redirect to='/' />
+              ) : (
+                <SignInAndSignUpPage />
+              )
+            }
+            />
+          </Suspense>
+        </ErrorBoundary>
+      </Switch>
+    </div>
+  );
 }
 
 const mapStateToProps = createStructuredSelector({
