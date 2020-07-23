@@ -1,6 +1,6 @@
-import React, {useEffect, lazy, Suspense} from'react';
+import React, {useEffect, lazy, Suspense, useCallback} from'react';
 import {Route} from 'react-router-dom';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { fetchCollectionsStartAsync } from '../../redux/shop/shop.actions';
 
@@ -12,11 +12,18 @@ import Spinner from '../../components/spinner/spinner.component';
 const CollectionsOverviewContainer = lazy(() => import('../../components/collections-overview/collections-overview.container'));
 const CollectionPageContainer = lazy(() => import('../collection/collection.container'));
 
-const ShopPage = ({fetchCollectionsStartAsync, match}) => {
+const ShopPage = ({ match }) => {
+
+    const dispatch = useDispatch()
+
+    const getCollections = useCallback(
+        () => dispatch(fetchCollectionsStartAsync()),
+        [dispatch]
+    )
 
     useEffect(() => {
-        fetchCollectionsStartAsync();
-    }, [fetchCollectionsStartAsync])
+        (getCollections());
+    }, [getCollections])
 
     return (
         <div className='shop-page'>
@@ -24,6 +31,7 @@ const ShopPage = ({fetchCollectionsStartAsync, match}) => {
                 <Route 
                     exact path={`${match.path}`} 
                     component={CollectionsOverviewContainer}
+                    
                 />
                 <Route 
                     path={`${match.path}/:collectionId`} 
@@ -34,11 +42,8 @@ const ShopPage = ({fetchCollectionsStartAsync, match}) => {
     );
 }
 
-const mapDispatchToProps = dispatch => ({
+/* const mapDispatchToProps = dispatch => ({
     fetchCollectionsStartAsync: () => dispatch(fetchCollectionsStartAsync())
-});
+}); */
 
-export default connect(
-    null, 
-    mapDispatchToProps
-)(ShopPage);
+export default ShopPage;

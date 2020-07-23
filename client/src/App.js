@@ -1,7 +1,7 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
+import { useDispatch, useSelector } from 'react-redux';
+// import { createStructuredSelector } from 'reselect';
 
 import HomePage from './pages/homepage/homepage.component';
 //import ShopPage from './pages/shop/shop.component';
@@ -23,7 +23,11 @@ const ShopPage = lazy(() => import('./pages/shop/shop.component'));
 const SignInAndSignUpPage = lazy(() => import('./pages/sign-in-and-sign-up/sign-in-and-sign-up.component'));
 const CheckoutPage = lazy(() => import('./pages/checkout/checkout.component'));
 
-const App = ({currentUser, setCurrentUser}) => {
+const App = user => {
+
+  const dispatch = useDispatch()
+
+  const getCurrentUser = useSelector(selectCurrentUser)
   
   useEffect(() => {
 
@@ -33,7 +37,7 @@ const App = ({currentUser, setCurrentUser}) => {
         const userRef = await createUserProfileDocument(userAuth);
 
         userRef.onSnapshot(snapShot => {
-          setCurrentUser(
+          dispatch(setCurrentUser(
             {
               id: snapShot.id,
               ...snapShot.data()
@@ -41,10 +45,10 @@ const App = ({currentUser, setCurrentUser}) => {
             () => {
               console.log('Current User : ', setCurrentUser)
             }
-          );
+          ));
         })
       } else {
-        setCurrentUser(userAuth);
+        dispatch(setCurrentUser(userAuth));
         console.log('Current User : ', setCurrentUser)
         //addCollectionAndDocuments('collections', collectionsArray)
       }
@@ -52,7 +56,7 @@ const App = ({currentUser, setCurrentUser}) => {
 
     return () => unsubscribeFromAuth()
 
-  }, [setCurrentUser])
+  }, [dispatch])
   
   return (
     <div>
@@ -65,7 +69,7 @@ const App = ({currentUser, setCurrentUser}) => {
             <Route path='/shop' component={ShopPage} />
             <Route exact path='/checkout' component={CheckoutPage}/>
             <Route exact path='/signin' render={() => 
-              currentUser ? (
+              getCurrentUser ? (
                 <Redirect to='/' />
               ) : (
                 <SignInAndSignUpPage />
@@ -79,7 +83,7 @@ const App = ({currentUser, setCurrentUser}) => {
   );
 }
 
-const mapStateToProps = createStructuredSelector({
+/* const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser
   //collectionsArray: selectCollectionsForPreview
 })
@@ -87,8 +91,6 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = dispatch => ({
   setCurrentUser: user => dispatch(setCurrentUser(user))
 })
+ */
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App);
+export default App;
